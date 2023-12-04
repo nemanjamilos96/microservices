@@ -1,0 +1,9 @@
+com\microservices\customer\service\impl\CustomerServiceImpl.class
+com\microservices\customer\model\Customer.class
+com\microservices\customer\model\CustomerRegistrationRequest$CustomerRegistrationRequestBuilder.class
+com\microservices\customer\controller\CustomerController.class
+com\microservices\customer\model\Customer$CustomerBuilder.class
+com\microservices\customer\model\CustomerRegistrationRequest.class
+com\microservices\customer\repository\CustomRepository.class
+com\microservices\customer\service\impl\CustomerService.class
+com\microservices\customer\CustomerApplication.class
