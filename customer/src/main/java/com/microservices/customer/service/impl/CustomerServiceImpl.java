@@ -1,5 +1,6 @@
 package com.microservices.customer.service.impl;
 
+import com.microservices.amqp.RabbitMqProducer;
 import com.microservices.customer.repository.CustomRepository;
 import com.microservices.customer.model.Customer;
 import com.microservices.customer.model.CustomerRegistrationRequest;
@@ -14,12 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    @Autowired
-    private CustomRepository customRepository;
-    @Autowired
-    private FraudClient fraudClient;
-    @Autowired
-    private NotificationClient notificationClient;
+
+    private final CustomRepository customRepository;
+    private final FraudClient fraudClient;
+    private final NotificationClient notificationClient;
+    private final RabbitMqProducer rabbitMqProducer;
 
     @Override
     public void registerCustomer(CustomerRegistrationRequest request) {
@@ -32,15 +32,19 @@ public class CustomerServiceImpl implements CustomerService {
         //todo: check if email not taken
         customRepository.saveAndFlush(customer);
         System.out.println(customer.getId());
-        //todo: check if fraudster
         FraudCheckRespons respons = fraudClient.isFraudster(customer.getId());
         if(respons.getIsFraudster())
             throw new IllegalStateException("Is fraudster");
-        notificationClient.sendNotification(new NotificationRequest(
+        NotificationRequest notificationRequest = new NotificationRequest(
                 customer.getId(),
                 customer.getEmail(),
                 String.format("Hi %s, welcome to Microservices...",
                         customer.getFirstName())
-        ));
+        );
+        rabbitMqProducer.publish(
+                notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing.key"
+        );
     }
 }

@@ -11,7 +11,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {
+                "com.microservices.customer",
+                "com.microservices.amqp"
+        }
+)
 @EnableEurekaClient
 @EnableFeignClients(
         basePackages = "com.microservices.clients"

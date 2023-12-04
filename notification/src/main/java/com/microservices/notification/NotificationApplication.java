@@ -1,13 +1,30 @@
 package com.microservices.notification;
 
+import com.microservices.amqp.RabbitMqProducer;
+import com.microservices.notification.config.NotificationConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {
+                "com.microservices.notification",
+                "com.microservices.amqp"
+        }
+)
 @EnableEurekaClient
 public class NotificationApplication {
     public static void main(String[] args) {
         SpringApplication.run(NotificationApplication.class, args);
     }
+
+    @Bean
+    CommandLineRunner commandLineRunner(RabbitMqProducer producer, NotificationConfig notificationConfig){
+        return args -> {
+            producer.publish("test test", notificationConfig.getInternalExchange(), notificationConfig.getInternalNotificationRoutingKey());
+        };
+    }
+
 }
